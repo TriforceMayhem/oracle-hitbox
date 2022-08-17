@@ -9,6 +9,9 @@ local ow = 0x0027
 local ofsy = 0
 local ofsx = 0
 local scrolling = 0x0D01
+if not userdata.containskey("addr") then
+	userdata.set("addr", false)
+end
 
 local function objects()
 	scrolling = mainmemory.read_u8(0x0D01)
@@ -33,6 +36,9 @@ local function objects()
 			w = mainmemory.read_u8(origin + ow)
 			h = mainmemory.read_u8(origin + oh)
 			gui.drawBox(x - w - ofsx,y - h + 16 - ofsy,x + w - 1 - ofsx,y + h + 15 - ofsy,0xFF2AF07E,0x602AF07E)
+			if userdata.get("addr") == true then
+				gui.drawString(x - w - ofsx, y - h - ofsy, string.format("%x", origin), 0xFFFFFFFF, 0xFF000000)
+			end
 		end
 		origin = origin + 0x40
 	end
@@ -42,4 +48,11 @@ end
 while true do
 	emu.frameadvance()
 	objects()
+	if input.getmouse()["Middle"] == true then
+		if userdata.get("addr") == true then
+			userdata.set("addr", false)
+		else 
+			userdata.set("addr", true)
+		end
+	end
 end
